@@ -1,368 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Retro TV Canvas</title>
-  <script src="https://jscolor.com/releases/2.4.6/jscolor.js"></script>
-  <style>
-    :root {
-      --rust: #7d4f35;
-      --tan: #c9a884;
-      --sage: #9bad97;
-      --ebony: #0d0602;
-      --olive: #5d6a55;
-      --chestnut: #6c4a33;
-      --charcoal: #353a2d;
-      --graphite: #5e5450;
-      --silver: #a4a0a2;
-      --brick: #692e0a;
-      --orange: #853e1d;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Retro TV Canvas</title>
+    <script src="https://jscolor.com/releases/2.4.6/jscolor.js"></script>
+    <style>
+        :root {
+            --rust: #7d4f35;
+            --tan: #c9a884;
+            --sage: #9bad97;
+            --ebony: #0d0602;
+            --olive: #5d6a55;
+            --chestnut: #6c4a33;
+            --charcoal: #353a2d;
+            --graphite: #5e5450;
+            --silver: #a4a0a2;
+            --brick: #692e0a;
+            --orange: #853e1d;
+        }
 
-    * {
-      box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        margin: 0;
-        background-color: var(--olive);
-        font-family: 'Courier New', Courier, monospace;
-        color: var(--silver);
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-image: url('assets/retroenv.png');
-        background-size: 1680px auto; 
-        image-rendering: pixelated;
-        image-rendering: crisp-edges; 
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-color: var(--orange); 
-    }
+        body {
+            margin: 0;
+            background-color: var(--olive);
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--silver);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('assets/retroenv.png');
+            background-size: 1680px auto;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-color: var(--orange);
+        }
 
-    .container {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 8px;
-    }
+        .container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+        }
 
-    .top-aligned {
-        align-self: flex-start;
-    }
+        .top-aligned {
+            align-self: flex-start;
+        }
 
-    canvas {
-      width: 626px;
-      height: 626px;
-      background-color: var(--sage);
-      border: 4px solid var(--graphite);
-      box-shadow: 0 0 5px var(--charcoal);
-    }
+        canvas {
+            width: 626px;
+            height: 626px;
+            background-color: var(--sage);
+            border: 4px solid var(--graphite);
+            box-shadow: 0 0 5px var(--charcoal);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-    .control-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 0; 
-      margin-left: 60px; 
-    }
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 0;
+            margin-left: 60px;
+        }
 
-    .button-creative {
-      background-color: var(--brick);
-      color: var(--silver);
-      border: 2px solid var(--graphite);
-      padding: 16px 10px;
-      font-size: 23px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      border-radius: 4px;
-      box-shadow: 3px 3px 0 var(--ebony);
-      width: 190px;
-      text-align: center;
-      font-family: 'Courier New', Courier, monospace;
-    }
+        .button-creative {
+            background-color: var(--brick);
+            color: var(--silver);
+            border: 2px solid var(--graphite);
+            padding: 16px 10px;
+            font-size: 23px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-radius: 4px;
+            box-shadow: 3px 3px 0 var(--ebony);
+            width: 190px;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
 
-    .button-creative:hover {
-      background-color: var(--tan);
-      color: var(--ebony);
-      transform: scale(1.05);
-    }
+        .button-creative:hover {
+            background-color: var(--tan);
+            color: var(--ebony);
+            transform: scale(1.05);
+        }
 
-    input[type="file"],
-    input[type="text"] {
-      background-color: var(--tan);
-      color: var(--ebony);
-      border: 2px solid var(--graphite);
-      padding: 4px;
-      font-size: 14px;
-      border-radius: 4px;
-      width: 100px;
-    }
+        input[type="file"],
+        input[type="text"] {
+            background-color: var(--tan);
+            color: var(--ebony);
+            border: 2px solid var(--graphite);
+            padding: 4px;
+            font-size: 14px;
+            border-radius: 4px;
+            width: 100px;
+        }
 
-    #color {
-      width: 100px;
-      box-sizing: border-box;
-    }
+        #color {
+            width: 100px;
+            box-sizing: border-box;
+        }
 
-    .color-picker {
-        width: 120px;
-        height: 100px;
-        border-radius: 50%;
-        border: 3px solid var(--graphite);
-        background-color: var(--brick);
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 2px 2px 0 var(--ebony);
-        font-family: 'Courier New', Courier, monospace;
-        padding: 0;
-        line-height: 60px;
-        margin-left: 48px;
-        margin-bottom: 34px;
-    }
+        .color-picker {
+            width: 120px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--graphite);
+            background-color: var(--brick);
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 var(--ebony);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 0;
+            line-height: 60px;
+            margin-left: 48px;
+            margin-bottom: 34px;
+        }
 
-    #infoBox {
-        display: none;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--sage);
-        color: var(--ebony);
-        border: 2px solid var(--graphite);
-        padding: 20px;
-        box-shadow: 4px 4px 0 var(--ebony);
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 6px;
-        max-width: 700px;
-        text-align: center;
-        z-index: 1000;
-    }
-
-
-  </style>
+        #infoBox {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--sage);
+            color: var(--ebony);
+            border: 2px solid var(--graphite);
+            padding: 20px;
+            box-shadow: 4px 4px 0 var(--ebony);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            max-width: 700px;
+            text-align: center;
+            z-index: 1000;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <canvas id="pixelCanvas"></canvas>
-    <div class="control-panel">
-        <input value="ffffff" data-jscolor="{preset:'dark'}" id="color" class="color-picker">        
-        <button class="button-creative" id="uploadButton">📩 Upload</button>
-        <input type="file" id="fileInput" accept="image/*" style="display: none;" />
-        <button class="button-creative" id="clearButton">🧼 Clear</button>      
-        <button class="button-creative" id="infoButton">📝 Info</button>     
+    <div class="container">
+        <canvas id="pixelCanvas"></canvas>
+        <div class="control-panel">
+            <input value="ffffff" data-jscolor="{preset:'dark'}" id="color" class="color-picker">
+            <button class="button-creative" id="uploadButton">📩 Upload</button>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+            <button class="button-creative" id="clearButton">🧼 Clear</button>
+            <button class="button-creative" id="infoButton">📝 Info</button>
+        </div>
+        <div id="infoBox">
+            <p>📺 Welcome to the UI of your own mini retro pixel screen!📺<br>
+                🎨 Use color-picker to choose your desired color and start drawing on the canvas <br>
+                📩 You can Upload a picture from your device by pressing "Upload" button or "Paste" (Ctrl-V) an image
+                you have in clipboard to send it. (Make sure that the picture is close to the 1:1 ratio to avoid
+                distortion)<br>
+                🧼 "Clear" button lets you start from scratch!</p>
+        </div>
     </div>
-        <div  id="infoBox">
-        <p>📺 Welcome to the UI of your own mini retro pixel screen!📺<br> 
-        🎨 Use color-picker to choose your desired color and start drawing on the canvas <br> 
-        📩 You can Upload a picture from your device by pressing "Upload" button or "Paste" (Ctrl-V) an image you have in clipboard to send it. (Make sure that the picture is close to the 1:1 ratio to avoid distortion)<br> 
-        🧼 "Clear" button lets you start from scratch!</p>
-    </div>
-    </div>
 
-<script>
-    const canvas = document.getElementById('pixelCanvas');
-    const ctx = canvas.getContext('2d');
-    const colorPicker = document.getElementById('color');
-    const ipAddress = "%%IP%%";
-    //const cols = "%%COLS%%";
-    //const rows = "%%ROWS%%";
-    //const ipAddress = "192.168.178.77";
-    const cols = 43;
-    const rows = 43;
-    const pixelSize = 14.4;
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('color');
+        const ipAddress = "%%IP%%";
+        const cols = 43;
+        const rows = 43;
+        const pixelSize = 14.4;
 
-    canvas.width = cols * pixelSize;
-    canvas.height = rows * pixelSize;
+        canvas.width = cols * pixelSize;
+        canvas.height = rows * pixelSize;
 
-    let isDrawing = false;
-    let history = [];
-    const maxHistorySize = 10;
-    let drawBuffer = [];
-    let lastX = -1, lastY = -1;
+        let isDrawing = false;
+        let history = [];
+        const maxHistorySize = 10;
+        let drawBuffer = [];
+        let lastX = -1, lastY = -1;
 
-    function saveState() {
-        if (history.length >= maxHistorySize) history.shift();
-        history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    }
-
-
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        initializeGrid();
-        history = [];
-        fetch(`http://${ipAddress}/clear`);
-    }
-
-    function initializeGrid() {
-        ctx.fillStyle = "#0d0602";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawGrid();
-    }
-
-    function drawGrid() {
-        ctx.strokeStyle = "#030b15";
-        ctx.lineWidth = 1;
-        for (let y = 0; y <= rows; y++) {
-            ctx.beginPath();
-            ctx.moveTo(0, y * pixelSize);
-            ctx.lineTo(canvas.width, y * pixelSize);
-            ctx.stroke();
+        function saveState() {
+            if (history.length >= maxHistorySize) history.shift();
+            history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
         }
-        for (let x = 0; x <= cols; x++) {
-            ctx.beginPath();
-            ctx.moveTo(x * pixelSize, 0);
-            ctx.lineTo(x * pixelSize, canvas.height);
-            ctx.stroke();
+
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            initializeGrid();
+            history = [];
+            fetch(`http://${ipAddress}/clear`);
         }
-    }
 
-    function getMousePos(event) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: Math.floor((event.clientX - rect.left) / pixelSize),
-            y: Math.floor((event.clientY - rect.top) / pixelSize)
-        };
-    }
-
-    function hexToRGB(hex) {
-        return {
-            r: parseInt(hex.substring(1, 3), 16),
-            g: parseInt(hex.substring(3, 5), 16),
-            b: parseInt(hex.substring(5, 7), 16)
-        };
-    }
-
-    function drawPixel(event) {
-        const { x, y } = getMousePos(event);
-        if (x !== lastX || y !== lastY) {
-            const { r, g, b } = hexToRGB(colorPicker.value);
-            ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        function initializeGrid() {
+            ctx.fillStyle = "#0d0602";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             drawGrid();
-            drawBuffer.push({ x, y, r, g, b });
-            lastX = x;
-            lastY = y;
         }
-    }
 
-    function sendDrawBuffer() {
-        if (drawBuffer.length === 0) return;
-        fetch(`http://${ipAddress}/batchDraw`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(drawBuffer)
-        }).catch(console.error);
-        drawBuffer = [];
-    }
+        function drawGrid() {
+            ctx.strokeStyle = "#030b15";
+            ctx.lineWidth = 1;
+            for (let y = 0; y <= rows; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * pixelSize);
+                ctx.lineTo(canvas.width, y * pixelSize);
+                ctx.stroke();
+            }
+            for (let x = 0; x <= cols; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x * pixelSize, 0);
+                ctx.lineTo(x * pixelSize, canvas.height);
+                ctx.stroke();
+            }
+        }
 
-    canvas.addEventListener('mousedown', e => { saveState(); isDrawing = true; drawPixel(e); });
-    canvas.addEventListener('mousemove', e => { if (isDrawing) drawPixel(e); });
-    canvas.addEventListener('mouseup', () => { isDrawing = false; sendDrawBuffer(); });
-    canvas.addEventListener('mouseleave', () => { isDrawing = false; sendDrawBuffer(); });
-    document.getElementById('clearButton').addEventListener('click', clearCanvas);
+        function getMousePos(event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.floor((event.clientX - rect.left) / pixelSize),
+                y: Math.floor((event.clientY - rect.top) / pixelSize)
+            };
+        }
 
-    function pixelateImage(file) {
-        const img = new Image();
-        const reader = new FileReader();
+        function hexToRGB(hex) {
+            return {
+                r: parseInt(hex.substring(1, 3), 16),
+                g: parseInt(hex.substring(3, 5), 16),
+                b: parseInt(hex.substring(5, 7), 16)
+            };
+        }
 
-        reader.onload = e => {
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const canvasAspect = canvas.width / canvas.height;
-                const imgAspect = img.width / img.height;
-                let drawWidth, drawHeight;
+        function drawPixel(event) {
+            const { x, y } = getMousePos(event);
+            if (x !== lastX || y !== lastY) {
+                const { r, g, b } = hexToRGB(colorPicker.value);
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                drawGrid();
+                drawBuffer.push({ x, y, r, g, b });
+                lastX = x;
+                lastY = y;
+            }
+        }
 
-                if (imgAspect > canvasAspect) {
-                    drawWidth = canvas.width;
-                    drawHeight = canvas.width / imgAspect;
-                } else {
-                    drawWidth = canvas.height * imgAspect;
-                    drawHeight = canvas.height;
-                }
+        function sendDrawBuffer() {
+            if (drawBuffer.length === 0) return;
+            fetch(`http://${ipAddress}/batchDraw`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(drawBuffer)
+            }).catch(console.error);
+            drawBuffer = [];
+        }
 
-                ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
-                const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
-                const rowsPixels = Array.from({ length: rows }, () => []);
 
-                for (let y = 0; y < rows; y++) {
-                    for (let x = 0; x < cols; x++) {
-                        const px = Math.floor((x / cols) * drawWidth);
-                        const py = Math.floor((y / rows) * drawHeight);
-                        const idx = (py * drawWidth + px) * 4;
-                        const r = imageData.data[idx],
-                              g = imageData.data[idx + 1],
-                              b = imageData.data[idx + 2];
+        // Unified pointer handlers (mouse, touch, pen)
+        canvas.addEventListener('pointerdown', e => {
+            // ignore non-left buttons on mouse
+            if (e.button !== undefined && e.button !== 0) return;
+            canvas.setPointerCapture?.(e.pointerId);
+            saveState();
+            isDrawing = true;
+            drawPixel(e);              // your existing drawPixel can read e.clientX/Y
+        }, { passive: false });
 
-                        ctx.fillStyle = `rgb(${r},${g},${b})`;
-                        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-                        rowsPixels[y].push({ x, y, r, g, b });
+        canvas.addEventListener('pointermove', e => {
+            if (!isDrawing) return;
+            drawPixel(e);
+        }, { passive: false });
+
+        const endStroke = e => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            canvas.releasePointerCapture?.(e.pointerId);
+            sendDrawBuffer();
+        };
+
+        canvas.addEventListener('pointerup', endStroke);
+        canvas.addEventListener('pointercancel', endStroke);
+        canvas.addEventListener('pointerleave', endStroke);
+
+        // Optional: prevent long-press context menu on mobile
+        canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+
+
+        document.getElementById('clearButton').addEventListener('click', clearCanvas);
+
+        function pixelateImage(file) {
+            const img = new Image();
+            const reader = new FileReader();
+
+            reader.onload = e => {
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const canvasAspect = canvas.width / canvas.height;
+                    const imgAspect = img.width / img.height;
+                    let drawWidth, drawHeight;
+
+                    if (imgAspect > canvasAspect) {
+                        drawWidth = canvas.width;
+                        drawHeight = canvas.width / imgAspect;
+                    } else {
+                        drawWidth = canvas.height * imgAspect;
+                        drawHeight = canvas.height;
+                    }
+
+                    ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
+                    const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
+                    const rowsPixels = Array.from({ length: rows }, () => []);
+
+                    for (let y = 0; y < rows; y++) {
+                        for (let x = 0; x < cols; x++) {
+                            const px = Math.floor((x / cols) * drawWidth);
+                            const py = Math.floor((y / rows) * drawHeight);
+                            const idx = (py * drawWidth + px) * 4;
+                            const r = imageData.data[idx],
+                                g = imageData.data[idx + 1],
+                                b = imageData.data[idx + 2];
+
+                            ctx.fillStyle = `rgb(${r},${g},${b})`;
+                            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                            rowsPixels[y].push({ x, y, r, g, b });
+                        }
+                    }
+
+                    drawGrid();
+                    sendRowsSequentially(rowsPixels, 0);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function sendRowsSequentially(rowsPixels, i) {
+            if (i >= rowsPixels.length) return;
+            fetch(`http://${ipAddress}/batchDraw`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(rowsPixels[i])
+            })
+                .then(() => sendRowsSequentially(rowsPixels, i + 1))
+                .catch(console.error);
+        }
+
+        document.getElementById('uploadButton').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) pixelateImage(file);
+        });
+
+        // Paste listener to detect images from clipboard
+        document.addEventListener('paste', event => {
+            const items = event.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    if (file) {
+                        pixelateImage(file);
+                        event.preventDefault();
+                        break;
                     }
                 }
+            }
+        });
 
-                drawGrid();
-                sendRowsSequentially(rowsPixels, 0);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
+        const infoButton = document.getElementById('infoButton');
+        const infoBox = document.getElementById('infoBox');
 
-    function sendRowsSequentially(rowsPixels, i) {
-        if (i >= rowsPixels.length) return;
-        fetch(`http://${ipAddress}/batchDraw`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(rowsPixels[i])
-        })
-        .then(() => sendRowsSequentially(rowsPixels, i + 1))
-        .catch(console.error);
-    }
-
-    document.getElementById('uploadButton').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-    });
-
-    document.getElementById('fileInput').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (file) pixelateImage(file);
-    });
-
-    // Paste listener to detect images from clipboard
-    document.addEventListener('paste', event => {
-    const items = event.clipboardData.items;
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.type.indexOf('image') !== -1) {
-        const file = item.getAsFile();
-        if (file) {
-            pixelateImage(file);
-            event.preventDefault();
-            break;
-        }
-        }
-    }
-    });
-
-    const infoButton = document.getElementById('infoButton');
-    const infoBox = document.getElementById('infoBox');
-
-    infoButton.addEventListener('click', () => {
-    if (infoBox.style.display === 'block') {
-        infoBox.style.display = 'none';
-    } else {
-        infoBox.style.display = 'block';
-    }
-    });
+        infoButton.addEventListener('click', () => {
+            if (infoBox.style.display === 'block') {
+                infoBox.style.display = 'none';
+            } else {
+                infoBox.style.display = 'block';
+            }
+        });
 
 
-    initializeGrid();
-</script>
+        initializeGrid();
+    </script>
 </body>
+
 </html>

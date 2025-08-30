@@ -108,9 +108,5 @@ The retro-TV housing is one example under `hardware/stl/`. Open the **parametric
 
 ---
 
-## 🔐 License
+## 🔐 See `LICENSE`
 
-* Code: **MIT**
-* Design/media (hardware/, docs/): **CC BY-NC 4.0** (unless you prefer MIT for all)
-
-See `LICENSE`

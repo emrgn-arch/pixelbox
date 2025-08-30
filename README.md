@@ -30,7 +30,10 @@
 * **Charging:** USB-C Li-ion charger (4.2 V / 1 A)
 * **Enclosure:** `hardware/step` (parametric) + `hardware/stl` (printable)
 
-![Exploded view](docs/exploded.png)
+
+<p align="center">
+  <img src="docs/exploded.png" alt="Exploded view" width="450">
+</p>
 
 > See `hardware/wiring.png` for a diagram.
 

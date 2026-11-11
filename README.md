@@ -15,7 +15,7 @@
 
 ## ✨ Highlights
 
-* **Standalone:** Boots, connects to Wi-Fi, shows its IP, and serves a built-in web UI (no extra apps needed).
+* **Standalone:** Boots, connects to Wi-Fi, shows a QR code to open it, and serves a built-in web UI (no extra apps needed).
 * **Modular:** Design and swap enclosures (STEPs + STLs), batteries, or even different TFT screens.
 * **Create your way:** Draw pixel-by-pixel, choose colors, clear, paste from the clipboard, or upload images.
 * **Fast updates:** A batch RGB drawing API enables quick and responsive rendering while keeping network traffic and MCU load within safe limits.
@@ -70,12 +70,12 @@ The web interface is defined in `data/index.html`. During the build process, a s
 
 ## ▶️ Use
 
-1. **Power PixelBox.** If it can’t join Wi-Fi, it starts a configuration portal named **MiniPC\_Config**—connect and set your Wi-Fi.
+1. **Power PixelBox.** If it can’t join Wi-Fi, it starts a configuration portal named **MiniPC\_Config** and shows a QR code. Scan it with your phone to join the portal (or join **MiniPC\_Config** manually), then pick your Wi-Fi on the setup page that opens. If the page doesn’t open by itself, go to `192.168.4.1`.
 
 > 💡 To reset or update Wi-Fi credentials later, hold down the button connected to **D6** while powering up the device. This will launch the configuration portal directly.
 
-2. On success, the TFT shows the device IP in your local subnet (e.g., `192.168.1.50`).
-3. Open that IP in a browser on the same network. You’ll see a pixel grid UI:
+2. On success, the TFT shows a QR code and the device IP in your local subnet (e.g., `192.168.1.50`). It stays on screen until the page is opened or something is drawn. Press the **D6** button at any time to show it again.
+3. Scan the QR code, or open that IP in a browser on the same network. You’ll see a pixel grid UI:
 
    * Pick colors
    * **Draw** pixels with mous or on touchscreen

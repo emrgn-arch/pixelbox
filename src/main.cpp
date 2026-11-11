@@ -5,6 +5,7 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
+#include <qrcode.h>
 
 #include "web_page.h"
 
@@ -27,10 +28,13 @@ Adafruit_ST7735 tft(TFT_CS, TFT_DC, TFT_RST);
 
 // === WiFi / EEPROM ===
 
+#define AP_NAME "MiniPC_Config"
+
 WiFiManager wm;
 ESP8266WebServer server(80);
 char ssid[64], pass[64];
 bool shouldSaveConfig = false;
+bool qrOnScreen = false;  // browser QR stays up until the device is first used
 
 // === Save credentials to EEPROM ===
 void saveCredentials(const char* newSSID, const char* newPass) {
@@ -69,6 +73,86 @@ void drawGrid(int cellWidth, int cellHeight, int cols, int rows) {
     tft.drawFastVLine(x * cellWidth - 1, 0, rows * cellHeight, ST77XX_BLACK);
 }
 
+// === QR code screens ===
+// How many bytes fit in QR versions 1-6 (low error correction, byte mode)
+const uint8_t QR_CAPACITY[] = {17, 32, 53, 78, 106, 134};
+
+void printCentered(const String& text, int y) {
+  int16_t x1, y1;
+  uint16_t w, h;
+  tft.getTextBounds(text, 0, y, &x1, &y1, &w, &h);
+  tft.setCursor((tft.width() - w) / 2, y);
+  tft.print(text);
+}
+
+// Full-screen QR with a title above it and one or two text lines below it
+void showQRScreen(const String& title, const String& payload, const String& line1, const String& line2 = "") {
+  uint8_t version = 1;
+  while (version < sizeof(QR_CAPACITY) && payload.length() > QR_CAPACITY[version - 1]) version++;
+  if (payload.length() > QR_CAPACITY[version - 1]) {
+    Serial.println("QR payload too long: " + payload);
+    return;
+  }
+
+  QRCode qr;
+  uint8_t qrData[qrcode_getBufferSize(version)];
+  qrcode_initText(&qr, qrData, version, ECC_LOW, payload.c_str());
+
+  // Fit the code between the title and footer, keeping a white border of 2 modules
+  const int lineH = 10, margin = 4, border = 2;
+  int areaTop = margin + lineH;
+  int areaBottom = tft.height() - margin - (line2.length() ? 2 : 1) * lineH;
+  int areaH = areaBottom - areaTop;
+  int scale = max(1, min(areaH, (int)tft.width()) / (qr.size + 2 * border));
+  int qrPx = qr.size * scale;
+  int x0 = (tft.width() - qrPx) / 2;
+  int y0 = areaTop + (areaH - qrPx) / 2;
+
+  tft.fillScreen(ST77XX_WHITE);
+  for (uint8_t y = 0; y < qr.size; y++)
+    for (uint8_t x = 0; x < qr.size; x++)
+      if (qrcode_getModule(&qr, x, y))
+        tft.fillRect(x0 + x * scale, y0 + y * scale, scale, scale, ST77XX_BLACK);
+
+  tft.setTextColor(ST77XX_BLACK);
+  tft.setTextSize(1);
+  printCentered(title, margin);
+  printCentered(line1, areaBottom);
+  if (line2.length()) printCentered(line2, areaBottom + lineH);
+}
+
+// Escape characters that have meaning in a WIFI: QR payload
+String escapeWiFiField(const String& s) {
+  String out;
+  for (char c : s) {
+    if (strchr("\\;,:\"", c)) out += '\\';
+    out += c;
+  }
+  return out;
+}
+
+// Called by WiFiManager once the setup hotspot is up; stays on screen while the portal runs
+void showWiFiSetupQR(WiFiManager* m) {
+  String apName = m->getConfigPortalSSID();
+  showQRScreen("Scan to set up WiFi",
+               "WIFI:T:nopass;S:" + escapeWiFiField(apName) + ";;",
+               "Join: " + apName,
+               "Then: " + WiFi.softAPIP().toString());
+}
+
+// QR that opens the drawing page; stays up until the page is opened or something is drawn
+void showBrowserQR() {
+  String ip = WiFi.localIP().toString();
+  showQRScreen("Scan to draw", "http://" + ip + "/", ip);
+  qrOnScreen = true;
+}
+
+void hideQR() {
+  if (!qrOnScreen) return;
+  qrOnScreen = false;
+  tft.fillScreen(ST77XX_BLACK);
+}
+
 // === Reusable CORS headers ===
 void setCORSHeaders() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -79,6 +163,7 @@ void setCORSHeaders() {
 // === Serve index.html from SPIFFS ===
 void handleRoot() {
   setCORSHeaders();
+  hideQR();
   String html = MAIN_page;  // copy from PROGMEM into RAM
   html.replace("%%IP%%", WiFi.localIP().toString());
   server.send(200, "text/html", html);
@@ -87,6 +172,7 @@ void handleRoot() {
 // === Clear screen ===
 void handleClear() {
   setCORSHeaders();
+  qrOnScreen = false;
   //tft.fillScreen(ST77XX_BLACK);
   tft.fillScreen(((0x0D & 0xF8) << 8) | ((0x06 & 0xFC) << 3) | (0x02 >> 3));
   server.send(200, "text/plain", "Cleared");
@@ -112,6 +198,7 @@ void handleBatchDraw() {
     return;
   }
 
+  hideQR();
   for (JsonObject pixel : doc.as<JsonArray>()) {
     int x = pixel["x"];
     int y = pixel["y"];
@@ -128,24 +215,25 @@ void handleBatchDraw() {
   server.send(200, "text/plain", "Batch Draw OK");
 }
 
+// === Config portal (blocks until WiFi is set up; QR is drawn by showWiFiSetupQR) ===
+void runConfigPortal() {
+  wm.startConfigPortal(AP_NAME);
+  if (shouldSaveConfig) {
+    saveCredentials(wm.getWiFiSSID().c_str(), wm.getWiFiPass().c_str());
+    ESP.restart();
+  }
+}
+
 // === WiFi setup (with WiFiManager) ===
 void setupWiFi() {
   EEPROM.begin(512);
   pinMode(RESET_WiFi, INPUT_PULLUP);  // Config button
 
   wm.setSaveConfigCallback(saveConfigCallback);
+  wm.setAPCallback(showWiFiSetupQR);
 
   if (digitalRead(RESET_WiFi) == LOW) {
-    tft.fillScreen(ST77XX_BLACK);
-    tft.setTextColor(ST77XX_WHITE);
-    tft.setTextSize(1);
-    tft.setCursor(0, 0);
-    tft.print("Connect WiFi to MiniPC_Config");
-    wm.startConfigPortal("MiniPC_Config");
-    if (shouldSaveConfig) {
-      saveCredentials(wm.getWiFiSSID().c_str(), wm.getWiFiPass().c_str());
-      ESP.restart();
-    }
+    runConfigPortal();
   } else {
     readCredentials();
     WiFi.begin(ssid, pass);
@@ -157,33 +245,27 @@ void setupWiFi() {
 
     if (WiFi.status() != WL_CONNECTED) {
       Serial.println("\nFailed to connect, starting config portal...");
-
-      tft.fillScreen(ST77XX_BLACK);
-      tft.setTextColor(ST77XX_WHITE);
-      tft.setTextSize(1);
-      tft.setCursor(0, 0);
-      tft.print("Connect WiFi to MiniPC_Config");
-      wm.startConfigPortal("MiniPC_Config");     
-    
-      if (shouldSaveConfig) {
-        saveCredentials(wm.getWiFiSSID().c_str(), wm.getWiFiPass().c_str());
-        ESP.restart();
-      }
+      runConfigPortal();
     }
   }
 
-  Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
+  // Portal was exited without saving: retry with the stored credentials
+  if (WiFi.status() != WL_CONNECTED) ESP.restart();
 
-  // Show IP on TFT for 3 seconds
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(1);
-  tft.setCursor(0, 0);
-  tft.print("IP Address:");
-  tft.setCursor(0, 11);
-  tft.print(WiFi.localIP().toString());
-  delay(3000); 
-  tft.fillScreen(ST77XX_BLACK);
+  Serial.println("\nWiFi connected: " + WiFi.localIP().toString());
+  showBrowserQR();
+}
+
+// === Pressing the config button while running shows the browser QR again ===
+void checkButton() {
+  static bool wasPressed = false;
+  static unsigned long lastPress = 0;
+  bool pressed = digitalRead(RESET_WiFi) == LOW;
+  if (pressed && !wasPressed && millis() - lastPress > 300) {
+    lastPress = millis();
+    showBrowserQR();
+  }
+  wasPressed = pressed;
 }
 
 // === Setup TFT and SPIFFS ===
@@ -219,5 +301,6 @@ void setup() {
 }
 
 void loop() {
-  server.handleClient();             
+  server.handleClient();
+  checkButton();
 }
